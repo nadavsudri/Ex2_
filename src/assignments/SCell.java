@@ -10,7 +10,6 @@ public class SCell implements Cell {
     // Add your code here
 
     public SCell(String s) {
-        // Add your code here
         setData(s);
     }
     public String getName(){return name;}
@@ -80,12 +79,13 @@ public void setData(String s) {
 
     @Override
     public int getType() {
-        if (getData().isEmpty())return 1;
-        if(getOrder()==-1)return -1;
-        if(getData().charAt(0)=='='&&!is_form(getData())){return -2;}
-        if (isText(getData())) {return 1;}
-        if (isNumber(getData())) {return 2;}
-        if (is_form(getData())) {return 3;}
+
+        if (getData().isEmpty())return Ex2Utils.TEXT;
+        if(this.dpth==Ex2Utils.ERR_CYCLE_FORM)return Ex2Utils.ERR_CYCLE_FORM;
+        if(getData().charAt(0)=='='&&!is_form(getData())){return Ex2Utils.ERR_FORM_FORMAT;}
+        if (isText(getData())) {return Ex2Utils.TEXT;}
+        if (isNumber(getData())) {return Ex2Utils.NUMBER;}
+        if (is_form(getData())) {return Ex2Utils.FORM;}
         return -1;
     }
 

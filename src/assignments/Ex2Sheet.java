@@ -13,8 +13,7 @@ public class Ex2Sheet implements Sheet {
             for(int j=0;j<y;j=j+1) {
                 table[i][j] = new SCell("");
                 table[i][j].setName(Extras.int2_char(i)+""+j);
-                System.out.println(this.table[i][j].getName());
-                table[i][j].setOrder(set_depth(table[i][j]));
+              //  System.out.println(this.table[i][j].getName());
             }
         }
         eval();
@@ -27,17 +26,17 @@ public class Ex2Sheet implements Sheet {
     public String value(int x, int y) {
         String ans = "ERR";
         Cell c = get(x,y);
+       int x1 =  c.getType();
+       Cell c2 = getSubCells(c);
+       if (c2!=null&&!SCell.is_form(c2.getData())) { return Ex2Utils.ERR_FORM;}
        switch (c.getType())
        {
+           case Ex2Utils.ERR_CYCLE_FORM: return "ERR_Cycle_Form";
            case Ex2Utils.TEXT : return c.getData();
            case Ex2Utils.NUMBER: return String.valueOf(Double.parseDouble(c.getData()));
-           case Ex2Utils.FORM: return String.valueOf(eValuate(c));
+           case Ex2Utils.FORM: return String.valueOf(eval(x, y));
            case Ex2Utils.ERR_FORM_FORMAT: return "ERR_Form_Format";
-           case Ex2Utils.ERR_CYCLE_FORM: return "ERR_Cycle_Form";
-
        }
-
-        /////////////////////
         return ans;
     }
 
@@ -73,9 +72,12 @@ public class Ex2Sheet implements Sheet {
     @Override
     public void eval() {
         int[][] dd = depth();
-        // Add your code here
+        for (int i = 0; i < width(); i++) {
+            for (int j = 0; j < height(); j++) {
+                table[i][j].setOrder(dd[i][j]);
 
-        // ///////////////////
+            }
+        }
     }
 
     @Override
@@ -86,9 +88,10 @@ public class Ex2Sheet implements Sheet {
         /////////////////////
         return ans;
     }
-    public  int set_depth (Cell a)
+    public int set_depth (Cell a)
     {   if (a.getType() == Ex2Utils.TEXT) {return 0;}
        if (a.getType() == Ex2Utils.NUMBER) {return 0;}
+       if (!SCell.is_form(a.getData())) {return Ex2Utils.ERR_FORM_FORMAT;}
         try{
         int depth = 0;
         String str = a.getData();
@@ -101,22 +104,21 @@ public class Ex2Sheet implements Sheet {
                     depth++;
                     int sub_depth = set_depth(table[Extras.char2num(b_name.charAt(0))][Integer.parseInt(b_name.substring(1))]);
                     if (sub_depth ==-1) {return -1;}
-                    return depth+ sub_depth;
                 }
+
             }
         }
         return depth;}
     catch (StackOverflowError e){return -1;}
 
     }
-
-
     @Override
     public int[][] depth() {
         int[][] ans = new int[width()][height()];
         for (int i = 0; i < width(); i++) {
             for (int j = 0; j < height(); j++) {
                 ans[i][j] = set_depth(table[i][j]);
+                this.table[i][j].setOrder(ans[i][j]);
             }
         }
         return ans;
@@ -138,14 +140,14 @@ public class Ex2Sheet implements Sheet {
 
     @Override
     public String eval(int x, int y) {
-        String ans = null;
-        if(get(x,y)!=null) {ans = get(x,y).getData();}
-        return String.valueOf(computeFrom(ans));
+        Cell ans = null;
+        if(get(x,y)!=null) {ans = get(x,y);}
+        return String.valueOf(eValuate(ans));
         }
 
     public double eValuate(Cell a)
     {
-        double value = 0;
+        double value=0;
         String str2eval;
         int a_depth = set_depth(a);
         if (SCell.isNumber(a.getData())){return Double.parseDouble(a.getData());}
@@ -156,10 +158,12 @@ public class Ex2Sheet implements Sheet {
         if (SCell.is_form(a.getData())&&a_depth!=0)
         {
             str2eval = a.getData().replace(getSubCells(a).getName(),String.valueOf(eValuate(getSubCells(a))));
-            if (contCellRef(str2eval)){ value = value + eValuate(getSubCells(str2eval));}
-            value =  value +computeFrom(str2eval);
+            Cell sub = new SCell(str2eval);
+            if (contCellRef(str2eval)){ value = value + eValuate(sub);}
+            if (!contCellRef(str2eval)) value =  value + computeFrom(str2eval);
         }
         return value;
+
     }
     public Cell getSubCells(Cell cell)
     {
@@ -191,8 +195,6 @@ public class Ex2Sheet implements Sheet {
     public static double computeFrom(String str) {
         str = str.replaceAll("\\s", ""); // remove all spaces
         str = str.replaceAll("=", ""); // remove all equal signs
-
-
         if (str.contains("(")) {
             int open = str.lastIndexOf('(');
             int close = str.indexOf(')', open);
