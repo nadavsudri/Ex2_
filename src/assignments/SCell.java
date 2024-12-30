@@ -5,6 +5,7 @@ public class SCell implements Cell {
     private String line;
     private int type;
     private String name;
+    private int dpth;
 
     // Add your code here
 
@@ -16,10 +17,10 @@ public class SCell implements Cell {
     public void setName(String n){ this.name = n;}
     @Override
     public int getOrder() {
-        if (isNumber(line)||isText(line) )return 0;
-        return 1;
+        return this.dpth;
 
     }
+
     public static boolean is_form(String str) // fails when a1.1 is enterd (cell ref with dec point)
     {
         boolean ans = true;
@@ -80,6 +81,7 @@ public void setData(String s) {
     @Override
     public int getType() {
         if (getData().isEmpty())return 1;
+        if(getOrder()==-1)return -1;
         if(getData().charAt(0)=='='&&!is_form(getData())){return -2;}
         if (isText(getData())) {return 1;}
         if (isNumber(getData())) {return 2;}
@@ -94,7 +96,6 @@ public void setData(String s) {
 
     @Override
     public void setOrder(int t) {
-        // Add your code here
-
+    this.dpth = t;
     }
 }
