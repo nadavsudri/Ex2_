@@ -1,19 +1,20 @@
 package assignments;
 import java.io.IOException;
+import java.util.Objects;
 // Add your documentation below:
 
 public class Ex2Sheet implements Sheet {
     private Cell[][] table;
-    // Add your code here
 
-    // ///////////////////
+
     public Ex2Sheet(int x, int y) {
         table = new SCell[x][y];
         for(int i=0;i<x;i=i+1) {
             for(int j=0;j<y;j=j+1) {
                 table[i][j] = new SCell("");
                 table[i][j].setName(Extras.int2_char(i)+""+j);
-              //  System.out.println(this.table[i][j].getName());
+                table[i][j].setType(table[i][j].getType());
+                //  System.out.println(this.table[i][j].getName());
             }
         }
         eval();
@@ -26,18 +27,17 @@ public class Ex2Sheet implements Sheet {
     public String value(int x, int y) {
         String ans = "ERR";
         Cell c = get(x,y);
-       int x1 =  c.getType();
-       Cell c2 = getSubCells(c);
-       if (c2!=null&&!SCell.is_form(c2.getData())) { return Ex2Utils.ERR_FORM;}
-       switch (c.getType())
-       {
-           case Ex2Utils.ERR_CYCLE_FORM: return "ERR_Cycle_Form";
-           case Ex2Utils.TEXT : return c.getData();
-           case Ex2Utils.NUMBER: return String.valueOf(Double.parseDouble(c.getData()));
-           case Ex2Utils.FORM: return String.valueOf(eval(x, y));
-           case Ex2Utils.ERR_FORM_FORMAT: return "ERR_Form_Format";
-       }
-        return ans;
+        if (c.getType() == Ex2Utils.ERR_CYCLE_FORM) {
+            return "ERR_Cycle_Form";
+        }
+        return switch (c.getType()) {
+            case Ex2Utils.ERR_FORM_FORMAT -> "ERR_Form_Format";
+            case Ex2Utils.TEXT -> c.getData();
+            case Ex2Utils.NUMBER -> String.valueOf(Double.parseDouble(c.getData()));
+            case Ex2Utils.FORM -> String.valueOf(eval(x, y));
+            default -> throw new IllegalArgumentException("Unknown cell type: " + c.getType());
+        };
+
     }
 
     @Override
@@ -75,8 +75,14 @@ public class Ex2Sheet implements Sheet {
         for (int i = 0; i < width(); i++) {
             for (int j = 0; j < height(); j++) {
                 table[i][j].setOrder(dd[i][j]);
+                table[i][j].setType(table[i][j].getType());
+                if (!table[i][j].getData().isEmpty()&&SCell.is_form(table[i][j].getData())&&contCellRef(table[i][j].getData())){
+                if (getSubCells(table[i][j])!=null&&!SCell.is_form(getSubCells(table[i][j]).getData()))table[i][j].setType(Ex2Utils.ERR_FORM_FORMAT);}
+
+
 
             }
+
         }
     }
 
@@ -145,17 +151,23 @@ public class Ex2Sheet implements Sheet {
         return String.valueOf(eValuate(ans));
         }
 
+     /**
+      * this method calculates the final value of a cell (with dependencies)
+      * @param a is checked - if a formula return from computeform. if contains subcells - recursivly calculates the subcells first.
+      * finally returns the value as a double.
+      *
+      * **/
     public double eValuate(Cell a)
     {
         double value=0;
         String str2eval;
         int a_depth = set_depth(a);
         if (SCell.isNumber(a.getData())){return Double.parseDouble(a.getData());}
-        if (SCell.is_form(a.getData())&&a_depth==0)
+        if (SCell.is_form(a.getData())&&a_depth==0&&!a.getData().isEmpty())
         {   str2eval = a.getData();
             return computeFrom(str2eval);
         }
-        if (SCell.is_form(a.getData())&&a_depth!=0)
+        if (SCell.is_form(a.getData())&&a_depth!=0&&!a.getData().isEmpty())
         {
             str2eval = a.getData().replace(getSubCells(a).getName(),String.valueOf(eValuate(getSubCells(a))));
             Cell sub = new SCell(str2eval);
@@ -165,8 +177,13 @@ public class Ex2Sheet implements Sheet {
         return value;
 
     }
+    /**
+     * this function return a Cell value for cell's subcell (if exists)
+     * @param cell's data is checked.
+     * **/
     public Cell getSubCells(Cell cell)
-    {
+    {   if(cell == null)return null;
+
         for (int i = 0; i < cell.getData().length(); i++)
         {
             if (Character.isLetter(cell.getData().charAt(i))&&(Extras.isCellRef(cell.getData().substring(i,i+1))||Extras.isCellRef(cell.getData().substring(i,i+2))))
@@ -179,6 +196,9 @@ public class Ex2Sheet implements Sheet {
         Cell ans = new SCell(str);
         return getSubCells(ans);
     }
+    /**boolean method - return if a given string contains a cell ref
+     * @param str
+     * **/
     private boolean contCellRef(String str)
     {  boolean ans = false;
         for (int i = 0; i < str.length(); i++)
@@ -193,35 +213,37 @@ public class Ex2Sheet implements Sheet {
     }
 
     public static double computeFrom(String str) {
-        str = str.replaceAll("\\s", ""); // remove all spaces
-        str = str.replaceAll("=", ""); // remove all equal signs
-        if (str.contains("(")) {
-            int open = str.lastIndexOf('(');
-            int close = str.indexOf(')', open);
-            String inside = str.substring(open + 1, close);
+        String strP = str;
+        strP = strP.replaceAll("\\s", ""); // remove all spaces
+        strP = strP.replaceAll("=", ""); // remove all equal signs
+        if (SCell.isNumber(strP))return Double.parseDouble(strP);
+        if (strP.contains("(")) {
+            int open = strP.lastIndexOf('(');
+            int close = strP.indexOf(')', open);
+            String inside = strP.substring(open + 1, close);
             double value = computeFrom(inside);
-            return computeFrom(str.substring(0, open) + value + str.substring(close + 1));
+            return computeFrom(strP.substring(0, open) + value + strP.substring(close + 1));
         }
 
-        for (int i = str.length() - 1; i >= 0; i--) {
-            char c = str.charAt(i);
+        for (int i = strP.length() - 1; i >= 0; i--) {
+            char c = strP.charAt(i);
             if (c == '+' || c == '-') {
-                double left = computeFrom(str.substring(0, i));
-                double right = computeFrom(str.substring(i + 1));
+                double left = computeFrom(strP.substring(0, i));
+                double right = computeFrom(strP.substring(i + 1));
                 if (c == '+') return left + right;
                 else return left - right;
             }
         }
 
-        for (int i = str.length() - 1; i >= 0; i--) {
-            char c = str.charAt(i);
+        for (int i = strP.length() - 1; i >= 0; i--) {
+            char c = strP.charAt(i);
             if (c == '*' || c == '/') {
-                double left = computeFrom(str.substring(0, i));
-                double right = computeFrom(str.substring(i + 1));
+                double left = computeFrom(strP.substring(0, i));
+                double right = computeFrom(strP.substring(i + 1));
                 if (c == '*') return left * right;
                 else return left / right;
             }
         }
-        return Double.parseDouble(str);
+        return Double.parseDouble(strP);
     }
 }

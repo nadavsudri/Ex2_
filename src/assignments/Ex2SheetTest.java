@@ -24,21 +24,8 @@ class Ex2SheetTest {
     @Test
     void tester1()
     {
-        Sheet s = new Ex2Sheet(2,2);
-        String[] ss = {"=1+1","=a1+1","=a0+a1","11"};
-        int inde = 0;
-        for (int i =0; i<2; i++)
-        {
-            for (int j =0; j<2; j++)
-            {
-                s.set(i,j,ss[inde]);
-                //System.out.println(s.get(i,j));
-                System.out.println(s.get(i,j).getName()+" -> "+s.get(i,j)+" -> "+ s.eval(i,j));
-                //System.out.println(set_depth(s.get(1,0)));
-                inde ++;
-                //System.out.println(s.get(i,j).getName());
-            }
-        }
+        Cell c = new SCell("=");
+        System.out.println(SCell.is_form("=0.a2"));
 
     }
 }

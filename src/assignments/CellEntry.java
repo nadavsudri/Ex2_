@@ -1,6 +1,7 @@
 package assignments;
-// Add your documentation below:
-
+/**
+ * this class represents a cordinated value for a cell's location
+ * **/
 public class CellEntry  implements Index2D {
 
     @Override
@@ -13,4 +14,7 @@ public class CellEntry  implements Index2D {
 
     @Override
     public int getY() {return Ex2Utils.ERR;}
+
+    @Override
+    public  String toString() {return"";}
 }
