@@ -677,7 +677,7 @@ public final class StdDrawEx2 implements ActionListener, MouseListener, MouseMot
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);            // closes all windows
 		// frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);      // closes only current window
-		frame.setTitle("Intro2CS (Ariel U.) Ex2 obf-jar solution, v0.2");
+		frame.setTitle("Ex2 Sol - Nadav sudri 322714924 - Cs101 Ariel");
 		frame.setJMenuBar(createMenuBar());
 
 
