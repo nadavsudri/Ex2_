@@ -32,6 +32,7 @@ public static boolean is_form(String str) {
     if (str == null) {
         return false;
     }
+    if(str.length() <2) {return false;}
 
     // Check for invalid characters or absence of '=' at the start
     if (!Extras.cont_invalid(str) || !str.startsWith("=")) {
@@ -145,6 +146,10 @@ public void setData(String s) {
     @Override
     public void setType(int t) {
         type = t;
+    }
+    public static boolean is_valid(Cell cell)
+    {
+        return (is_form(cell.getData()) || isNumber(cell.getData())|| isText(cell.getData()));
     }
 
     @Override

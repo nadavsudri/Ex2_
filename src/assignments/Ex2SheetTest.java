@@ -25,7 +25,7 @@ class Ex2SheetTest {
     void tester1()
     {
         Cell c = new SCell("=");
-        System.out.println(SCell.is_form("=0.a2"));
+        System.out.println(SCell.is_form("="));
 
     }
 }

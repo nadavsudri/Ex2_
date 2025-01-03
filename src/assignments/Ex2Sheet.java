@@ -1,4 +1,6 @@
 package assignments;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Objects;
 // Add your documentation below:
@@ -76,11 +78,11 @@ public class Ex2Sheet implements Sheet {
             for (int j = 0; j < height(); j++) {
                 table[i][j].setOrder(dd[i][j]);
                 table[i][j].setType(table[i][j].getType());
-                if (!table[i][j].getData().isEmpty()&&SCell.is_form(table[i][j].getData())&&contCellRef(table[i][j].getData())){
-                if (getSubCells(table[i][j])!=null&&!SCell.is_form(getSubCells(table[i][j]).getData()))table[i][j].setType(Ex2Utils.ERR_FORM_FORMAT);}
-
-
-
+                if (getSubCells(table[i][j])!=null)
+                {Cell sub = getSubCells(table[i][j] );
+                    if(!SCell.is_valid(sub))
+                        table[i][j].setType(Ex2Utils.ERR_FORM_FORMAT);
+                }
             }
 
         }
@@ -132,18 +134,28 @@ public class Ex2Sheet implements Sheet {
 
     @Override
     public void load(String fileName) throws IOException {
-        // Add your code here
+        FileReader fr = new FileReader(fileName);
 
-        /////////////////////
+
+
+
     }
 
     @Override
     public void save(String fileName) throws IOException {
-        // Add your code here
-
-        /////////////////////
+        FileWriter fw = new FileWriter(fileName);
+        fw.write("This is Txt File for " + fileName + "Using Ex2_Cs101 Sol");
+        fw.write("\n");
+        for (int i = 0; i < width(); i++) {
+            for (int j = 0; j < height(); j++) {
+                if (!table[i][j].getData().isEmpty())
+                { fw.write(table[i][j].getName()+" "+table[i][j].getData());}
+                fw.write("\n");
+            }
+        }
+        fw.close();
     }
-
+    /**Uses Evaluate to det the printed value for call (x,y)**/
     @Override
     public String eval(int x, int y) {
         Cell ans = null;
@@ -196,9 +208,12 @@ public class Ex2Sheet implements Sheet {
         Cell ans = new SCell(str);
         return getSubCells(ans);
     }
-    /**boolean method - return if a given string contains a cell ref
-     * @param str
-     * **/
+    /**
+     * boolean method - return if a given string contains a cell ref
+     * Checks if a given string contains a valid cell reference.
+     * @param str The input string to be checked. The string may contain letters, numbers, and other characters.
+     *           Examples: "A1", "12+A2", "abc".
+     **/
     private boolean contCellRef(String str)
     {  boolean ans = false;
         for (int i = 0; i < str.length(); i++)
@@ -211,7 +226,13 @@ public class Ex2Sheet implements Sheet {
         }
         return ans;
     }
-
+/**
+ * Computes the result of a mathematical expression given as a string.
+ * The function supports basic arithmetic operations (+, -, *, /) and handles parentheses.
+ * @param str The mathematical expression as a string.
+ *            The expression can include numbers, arithmetic operators, and parentheses.
+ *            Examples: "1 + 2", "(3 + 5) * 2", "12 / (4 - 2)"
+ **/
     public static double computeFrom(String str) {
         String strP = str;
         strP = strP.replaceAll("\\s", ""); // remove all spaces
