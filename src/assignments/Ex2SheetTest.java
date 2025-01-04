@@ -2,6 +2,8 @@ package assignments;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.*;
 class Ex2SheetTest {
 
@@ -13,6 +15,11 @@ class Ex2SheetTest {
         System.out.println((ex2Sheet.get(0,0).getType()));
         System.out.println(ex2Sheet.set_depth(ex2Sheet.get(0,0)));
 
+    }
+    @Test
+    void load() throws IOException {
+        Ex2Sheet ex2Sheet = new Ex2Sheet(1,1);
+        ex2Sheet.load("/Users/nadavsudri/Desktop/School\\Study/מטלות סימסטר א/Untitled");
     }
 
     @Test

@@ -1,5 +1,4 @@
 package assignments;
-
 import java.awt.*;
 import java.io.IOException;
 
@@ -123,7 +122,7 @@ public class Ex2GUI {
 	 * @param yy the y coordinate of the required cell.
 	 */
 	private static void inputCell(int xx,int yy) {
-		if(table.isIn(xx,yy)) {
+		if(table. isIn(xx,yy)) {
 			Cell cc = table.get(xx,yy);
 			String ww = cc.getName()+": "+cc.toString()+" : ";
 			StdDrawEx2.text(Ex2Utils.GUI_X_START, Ex2Utils.MAX_X-1, ww);

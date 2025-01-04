@@ -1,4 +1,5 @@
 package assignments;
+import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -67,9 +68,6 @@ public class Ex2Sheet implements Sheet {
         Cell c = new SCell(s);
         table[x][y] = c;
         c.setName(Extras.int2_char(x)+""+y);
-        // Add your code here
-
-        /////////////////////
     }
     @Override
     public void eval() {
@@ -78,7 +76,7 @@ public class Ex2Sheet implements Sheet {
             for (int j = 0; j < height(); j++) {
                 table[i][j].setOrder(dd[i][j]);
                 table[i][j].setType(table[i][j].getType());
-                if (getSubCells(table[i][j])!=null)
+                if (SCell.is_form(table[i][j].getData())&&getSubCells(table[i][j])!=null)
                 {Cell sub = getSubCells(table[i][j] );
                     if(!SCell.is_valid(sub))
                         table[i][j].setType(Ex2Utils.ERR_FORM_FORMAT);
@@ -91,9 +89,6 @@ public class Ex2Sheet implements Sheet {
     @Override
     public boolean isIn(int xx, int yy) {
         boolean ans = xx>=0 && yy>=0;
-        // Add your code here
-
-        /////////////////////
         return ans;
     }
     public int set_depth (Cell a)
@@ -131,14 +126,34 @@ public class Ex2Sheet implements Sheet {
         }
         return ans;
     }
-
+    private void clear()
+    {
+        for (int i = 0; i < width(); i++) {
+            for (int j = 0; j < height(); j++) {
+                this.table[i][j] = new SCell("");
+            }
+        }
+    }
     @Override
-    public void load(String fileName) throws IOException {
+    public void load(String fileName) throws IOException  {
+        clear();
         FileReader fr = new FileReader(fileName);
+        BufferedReader br = new BufferedReader(fr);
+        String line = br.readLine();
+        int count = 0;
+        while (line != null)
+        {
+            line = br.readLine();
+            count++;
+            if(line != null&&!line.isEmpty()&&count!=0&&Extras.isCellRef(line.substring(0,2).replace(" ","")))
+            {
+                String cord = line.substring(0,2).replace(" ","");
+                int x = Extras.get_x(cord);
+                int y = Extras.get_y(cord);
+                set(x, y,line.replace(cord,"").replace(" ",""));
+            }
 
-
-
-
+        }
     }
 
     @Override

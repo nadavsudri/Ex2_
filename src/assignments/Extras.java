@@ -56,6 +56,12 @@ public  static char int2_char(int x)
         }
         return true;
     }
+    public static int get_x(String str) {
+    return char2num(str.charAt(0));
+    }
+    public static int get_y(String str) {
+    return Integer.parseInt(str.substring(1,2));
+    }
 
     public static boolean isCellRef(String str) {
         if (str == null) {
