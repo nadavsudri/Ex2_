@@ -3,11 +3,14 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 // Add your documentation below:
 
 public class Ex2Sheet implements Sheet {
     private Cell[][] table;
+   private Set<Cell> visitedCells = new HashSet<>(); //  (used in set_Depth) Track Subcells that was chacked
 
 
     public Ex2Sheet(int x, int y) {
@@ -25,7 +28,13 @@ public class Ex2Sheet implements Sheet {
     public Ex2Sheet() {
         this(Ex2Utils.WIDTH, Ex2Utils.HEIGHT);
     }
-
+/**
+ * returns the printed value of a cell
+ * if Err - return the ERR string
+ * if number - return the number as a double
+ * id text - return the text
+ * if formula - calculate it (with dependencies)
+ * **/
     @Override
     public String value(int x, int y) {
         String ans = "ERR";
@@ -69,6 +78,9 @@ public class Ex2Sheet implements Sheet {
         table[x][y] = c;
         c.setName(Extras.int2_char(x)+""+y);
     }
+    /**uses the main evaluate function **below** to calculate values for all @table
+     * the void update the printed value of each cell.
+     * **/
     @Override
     public void eval() {
         int[][] dd = depth();
@@ -91,30 +103,74 @@ public class Ex2Sheet implements Sheet {
         boolean ans = xx>=0 && yy>=0;
         return ans;
     }
-    public int set_depth (Cell a)
-    {   if (a.getType() == Ex2Utils.TEXT) {return 0;}
-       if (a.getType() == Ex2Utils.NUMBER) {return 0;}
-       if (!SCell.is_form(a.getData())) {return Ex2Utils.ERR_FORM_FORMAT;}
-        try{
-        int depth = 0;
-        String str = a.getData();
-        for (int i = 0; i < str.length(); i++)
-        {
-            if (Character.isLetter(str.charAt(i)))
-            {
-                if(Extras.isCellRef(str.substring(i,i+1))||Extras.isCellRef(str.substring(i,i+2)))
-                {   String b_name = Extras.isCellRef(str.substring(i,i+1)) ? str.substring(i,i+1) : str.substring(i,i+2);
-                    depth++;
-                    int sub_depth = set_depth(table[Extras.char2num(b_name.charAt(0))][Integer.parseInt(b_name.substring(1))]);
-                    if (sub_depth ==-1) {return -1;}
-                }
 
-            }
+    /**
+     * this method recives a Cell and return the Depth of it.
+     * the method uses a Set (defined above) to detect circular references before an STOF is accuring
+     * @param a is being checked recursively when each the depth subcell that 'a' contains ia added to it.
+     * for "1+a2" when a2 is: "=12*12" the function returns 1.
+     *
+     * **/
+    public int set_depth(Cell a) {
+        if (a.getType() == Ex2Utils.TEXT) {
+            return 0;
         }
-        return depth;}
-    catch (StackOverflowError e){return -1;}
+        if (a.getType() == Ex2Utils.NUMBER) {
+            return 0;
+        }
+        if (!SCell.is_form(a.getData())) {
+            return Ex2Utils.ERR_FORM_FORMAT; // Invalid formula
+        }
+        // Check for circular references
+        if (visitedCells.contains(a)) {
+            return -1; // Circular reference detected
+        }
+        try {
+            visitedCells.add(a); // Mark the current cell as visited
+            int depth = 0;
+            String str = a.getData();
 
+            for (int i = 0; i < str.length(); i++) {
+                if (Character.isLetter(str.charAt(i))) {
+                    int start = i;
+                    while (i < str.length() && Character.isLetter(str.charAt(i))) {
+                        i++;
+                    }
+                    String column = str.substring(start, i);
+                    start = i;
+                    while (i < str.length() && Character.isDigit(str.charAt(i))) {
+                        i++;
+                    }
+                    String row = str.substring(start, i);
+                    // Verify the cell reference
+                    if (!row.isEmpty() && Extras.isCellRef(column + row)) {
+                        String b_name = column + row;
+                        // Extract the referenced cell
+                        Cell subCell = table[Extras.char2num(b_name.charAt(0))][Integer.parseInt(b_name.substring(1))];
+                        // Check for self-reference
+                        if (subCell == a) {
+                            return -1; // Self-reference detected
+                        }
+                        int sub_depth = set_depth(subCell);
+                        if (sub_depth == -1) {
+                            return -1;// circular dependency
+                        }
+                        depth = Math.max(depth, sub_depth + 1);
+                    }
+
+                }
+            }
+            visitedCells.remove(a); // Remove from visited after processing
+            return depth;
+
+        } catch (StackOverflowError e) {
+            return -1; // Infinite recursion (stack overflow)
+        }
     }
+/**
+ * this method returns an int array that reflects the depth of each cell at @table.
+ * uses @set_depth method
+ * **/
     @Override
     public int[][] depth() {
         int[][] ans = new int[width()][height()];
@@ -126,6 +182,7 @@ public class Ex2Sheet implements Sheet {
         }
         return ans;
     }
+    //clear this.table
     private void clear()
     {
         for (int i = 0; i < width(); i++) {
@@ -155,7 +212,21 @@ public class Ex2Sheet implements Sheet {
 
         }
     }
-
+    /**
+     * this method saves the spreadsheet as a text file using java's filereader.
+     * ex:
+     *      This is Txt File for /Users/nadavsudri/Desktop/School \ Study/UntitledUsing Ex2_Cs101 Sol
+     *      a0 1
+     *      a1 2
+     *      a2 3
+     *      a3 =5*a1
+     *      a4 =123
+     *      a5 123
+     *      a6 axa32dd23d=
+     *      a7 321wsdx3x
+     *      a8 =a2
+     *      a9 =1as21
+     * **/
     @Override
     public void save(String fileName) throws IOException {
         FileWriter fw = new FileWriter(fileName);
@@ -196,6 +267,7 @@ public class Ex2Sheet implements Sheet {
         }
         if (SCell.is_form(a.getData())&&a_depth!=0&&!a.getData().isEmpty())
         {
+            String datafordb = getSubCells(a).getData();
             str2eval = a.getData().replace(getSubCells(a).getName(),String.valueOf(eValuate(getSubCells(a))));
             Cell sub = new SCell(str2eval);
             if (contCellRef(str2eval)){ value = value + eValuate(sub);}
