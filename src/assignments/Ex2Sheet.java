@@ -6,12 +6,38 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-// Add your documentation below:
-
+/**
+ * Ex2Sheet Class Documentation
+ * Overview:
+ * The Ex2Sheet class represents a digital spreadsheet with cells that can contain text, numbers, or formulas.
+ * It provides methods for manipulating and evaluating the spreadsheet, handling circular references, and performing arithmetic operations.
+ * ___________________________________
+ * ___Methods___:
+ * value(int x, int y)
+ * get(int x, int y)
+ * get(String cords)
+ * width()
+ * height()
+ * set(int x, int y, String s)
+ * eval()
+ * isIn(int xx, int yy)
+ * set_depth(Cell a)
+ * depth()
+ * clear()
+ * load(String fileName) throws IOException
+ * save(String fileName) throws IOException
+ * eval(int x, int y)
+ * eValuate(Cell a)
+ * getSubCells(Cell cell)
+ * getSubCells(String str)
+ * contCellRef(String str)
+ * computeFrom(String str)
+ *
+ * documentation for each method exists next to the method itself.
+ * **/
 public class Ex2Sheet implements Sheet {
     private Cell[][] table;
    private Set<Cell> visitedCells = new HashSet<>(); //  (used in set_Depth) Track Subcells that was chacked
-
 
     public Ex2Sheet(int x, int y) {
         table = new SCell[x][y];
@@ -65,11 +91,12 @@ public class Ex2Sheet implements Sheet {
     }
 
     @Override
-    public int width() {
+    public int width() { // returns this.length
         return table.length;
     }
     @Override
-    public int height() {
+    public int height() // returns this.height
+    {
         return table[0].length;
     }
     @Override
@@ -89,21 +116,22 @@ public class Ex2Sheet implements Sheet {
                 table[i][j].setOrder(dd[i][j]);
                 table[i][j].setType(table[i][j].getType());
                 if (SCell.is_form(table[i][j].getData())&&getSubCells(table[i][j])!=null)
-                {Cell sub = getSubCells(table[i][j] );
-                    if(!SCell.is_valid(sub))
+                {
+                    Cell sub = getSubCells(table[i][j] );
+                    if(!SCell.is_valid(sub)||sub.getData().isEmpty())
                         table[i][j].setType(Ex2Utils.ERR_FORM_FORMAT);
                 }
             }
-
         }
     }
-
     @Override
     public boolean isIn(int xx, int yy) {
         boolean ans = xx>=0 && yy>=0;
-        return ans;
+        if(ans)
+        {Cell cell = get(xx, yy);
+        return cell!=null;}
+        return false;
     }
-
     /**
      * this method recives a Cell and return the Depth of it.
      * the method uses a Set (defined above) to detect circular references before an STOF is accuring
@@ -112,59 +140,36 @@ public class Ex2Sheet implements Sheet {
      *
      * **/
     public int set_depth(Cell a) {
-        if (a.getType() == Ex2Utils.TEXT) {
-            return 0;
-        }
-        if (a.getType() == Ex2Utils.NUMBER) {
-            return 0;
-        }
-        if (!SCell.is_form(a.getData())) {
-            return Ex2Utils.ERR_FORM_FORMAT; // Invalid formula
-        }
-        // Check for circular references
-        if (visitedCells.contains(a)) {
-            return -1; // Circular reference detected
-        }
+        if (a.getType() == Ex2Utils.TEXT) {return 0;}
+        if (a.getType() == Ex2Utils.NUMBER) {return 0;}
+        if (!SCell.is_form(a.getData())) {return Ex2Utils.ERR_FORM_FORMAT;}
+        if (visitedCells.contains(a)) {return -1;}
         try {
-            visitedCells.add(a); // Mark the current cell as visited
+            visitedCells.add(a); // mark the current cell as checked
             int depth = 0;
             String str = a.getData();
-
             for (int i = 0; i < str.length(); i++) {
                 if (Character.isLetter(str.charAt(i))) {
                     int start = i;
-                    while (i < str.length() && Character.isLetter(str.charAt(i))) {
-                        i++;
-                    }
+                    while (i < str.length() && Character.isLetter(str.charAt(i))) {i++;}
                     String column = str.substring(start, i);
                     start = i;
-                    while (i < str.length() && Character.isDigit(str.charAt(i))) {
-                        i++;
-                    }
+                    while (i < str.length() && Character.isDigit(str.charAt(i))) {i++;}
                     String row = str.substring(start, i);
-                    // Verify the cell reference
                     if (!row.isEmpty() && Extras.isCellRef(column + row)) {
                         String b_name = column + row;
-                        // Extract the referenced cell
                         Cell subCell = table[Extras.char2num(b_name.charAt(0))][Integer.parseInt(b_name.substring(1))];
-                        // Check for self-reference
-                        if (subCell == a) {
-                            return -1; // Self-reference detected
-                        }
+                        if (subCell == a) {return -1;}
                         int sub_depth = set_depth(subCell);
-                        if (sub_depth == -1) {
-                            return -1;// circular dependency
-                        }
+                        if (sub_depth == -1) {return -1;}
                         depth = Math.max(depth, sub_depth + 1);
                     }
-
                 }
             }
-            visitedCells.remove(a); // Remove from visited after processing
+            visitedCells.remove(a);
             return depth;
-
         } catch (StackOverflowError e) {
-            return -1; // Infinite recursion (stack overflow)
+            return -1;
         }
     }
 /**
@@ -191,6 +196,10 @@ public class Ex2Sheet implements Sheet {
             }
         }
     }
+    /**
+     * this method loads the saved txt file and assignes each cell with its correct value.
+     * uses java's Filereader and Java's Bufferreader
+     * **/
     @Override
     public void load(String fileName) throws IOException  {
         clear();
@@ -252,6 +261,7 @@ public class Ex2Sheet implements Sheet {
      /**
       * this method calculates the final value of a cell (with dependencies)
       * @param a is checked - if a formula return from computeform. if contains subcells - recursivly calculates the subcells first.
+      *          if a contais a subcell - it calculate the subcell (ex: 1+A1 [A1="12"] ->  1+calc(A1) -> 1+12 -> 13)
       * finally returns the value as a double.
       *
       * **/
@@ -266,35 +276,46 @@ public class Ex2Sheet implements Sheet {
             return computeFrom(str2eval);
         }
         if (SCell.is_form(a.getData())&&a_depth!=0&&!a.getData().isEmpty())
-        {
-            String datafordb = getSubCells(a).getData();
+        {   Cell c = getSubCells(a);
+            String name = c.getName();
             str2eval = a.getData().replace(getSubCells(a).getName(),String.valueOf(eValuate(getSubCells(a))));
             Cell sub = new SCell(str2eval);
             if (contCellRef(str2eval)){ value = value + eValuate(sub);}
             if (!contCellRef(str2eval)) value =  value + computeFrom(str2eval);
         }
         return value;
-
     }
     /**
      * this function return a Cell value for cell's subcell (if exists)
      * @param cell's data is checked.
      * **/
-    public Cell getSubCells(Cell cell)
-    {   if(cell == null)return null;
+    public Cell getSubCells(Cell cell) {
+        if (cell == null) return null;
 
-        for (int i = 0; i < cell.getData().length(); i++)
-        {
-            if (Character.isLetter(cell.getData().charAt(i))&&(Extras.isCellRef(cell.getData().substring(i,i+1))||Extras.isCellRef(cell.getData().substring(i,i+2))))
-                return table[Extras.char2num(cell.getData().charAt(i))][Integer.parseInt(cell.getData().substring(i+1,i+2))];
+        for (int i = 0; i < cell.getData().length(); i++) {
+            char currentChar = cell.getData().charAt(i);
+            if (Character.isLetter(currentChar)) {
+                currentChar = Character.toUpperCase(currentChar); // Normalize to uppercase
+                if (currentChar >= 'A' && currentChar <= 'Z') {
+                    if (i + 1 < cell.getData().length() && Character.isDigit(cell.getData().charAt(i + 1))) {
+                        int rowEnd = i + 2;
+                        if (rowEnd < cell.getData().length() && Character.isDigit(cell.getData().charAt(rowEnd))) {
+                            rowEnd++;
+                        }
+                        int row = Integer.parseInt(cell.getData().substring(i + 1, rowEnd));
+                        if (row >= 0 && row <= 99) {
+                            return table[Extras.char2num(currentChar)][row];
+                        }
+                    }
+                }
+            }
         }
+
+        // No valid subcell reference found
         return null;
     }
-    public Cell getSubCells(String str)
-    {
-        Cell ans = new SCell(str);
-        return getSubCells(ans);
-    }
+
+
     /**
      * boolean method - return if a given string contains a cell ref
      * Checks if a given string contains a valid cell reference.
@@ -332,7 +353,6 @@ public class Ex2Sheet implements Sheet {
             double value = computeFrom(inside);
             return computeFrom(strP.substring(0, open) + value + strP.substring(close + 1));
         }
-
         for (int i = strP.length() - 1; i >= 0; i--) {
             char c = strP.charAt(i);
             if (c == '+' || c == '-') {
@@ -342,7 +362,6 @@ public class Ex2Sheet implements Sheet {
                 else return left - right;
             }
         }
-
         for (int i = strP.length() - 1; i >= 0; i--) {
             char c = strP.charAt(i);
             if (c == '*' || c == '/') {

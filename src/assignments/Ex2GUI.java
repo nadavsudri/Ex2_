@@ -1,7 +1,6 @@
 package assignments;
 import java.awt.*;
 import java.io.IOException;
-
 /**
  * ArielU. Intro2CS, Ex2: https://docs.google.com/document/d/1-18T-dj00apE4k1qmpXGOaqttxLn-Kwi/edit?usp=sharing&ouid=113711744349547563645&rtpof=true&sd=true
  * DO NOT CHANGE THIS INTERFACE!!
@@ -15,11 +14,9 @@ import java.io.IOException;
  *
  */
 public class Ex2GUI {
-
 	private static Sheet table; // this is the main data (an implementation of the Sheet interface).
 	private static Index2D cord = null; // a table entry used by the GUI of setting up a cell value / form
-	public Ex2GUI() {;}  // an empty (redundant) constructor.
-
+	public Ex2GUI() {}  // an empty (redundant) constructor.
 	/** The main function for running Ex2 */
 	public static void main(String[] a) {
 		table = new Ex2Sheet(Ex2Utils.WIDTH, Ex2Utils.HEIGHT);
@@ -73,7 +70,6 @@ public class Ex2GUI {
 		if(t== Ex2Utils.ERR_CYCLE_FORM) {ans= StdDrawEx2.BOOK_RED;}
 		return ans;
 	}
-
 	/**
 	 * Draws the lines of the spreadsheet.
 	 */
@@ -115,7 +111,6 @@ public class Ex2GUI {
 			}
 		}
 	}
-
 	/** input a content into cell(xx,yy) if it is within this SpreadSheet.
 	 *
 	 * @param xx the x coordinate of the required cell.

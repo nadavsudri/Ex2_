@@ -1,18 +1,12 @@
 package assignments;
-// Add your documentation below:
-
 import java.util.Objects;
-
 public class SCell implements Cell {
     private String line;
     private int type;
     private String name;
     private int dpth;
-
     // Add your code here
-
     public SCell(String s) {
-
         setData(s);
         this.type = getType();
     }
@@ -28,69 +22,23 @@ public class SCell implements Cell {
  * @param str and return if the string is a valid formula or not.
  * **/
 public static boolean is_form(String str) {
-    // Null check
-    if (str == null) {
-        return false;
-    }
-    if(str.length() <2) {return false;}
-
-    // Check for invalid characters or absence of '=' at the start
-    if (!Extras.cont_invalid(str) || !str.startsWith("=")) {
-        return false;
-    }
-
-    // Ensure there's only one '=' at the start and not elsewhere
-    if (str.substring(1).contains("=")) {
-        return false;
-    }
-
-    // Check if the last character is a letter (invalid in formulas)
-    if (Character.isLetter(str.charAt(str.length() - 1))) {
-        return false;
-    }
-
-    // Ensure balanced parentheses
-    if (Extras.inst_counter(str, '(') != Extras.inst_counter(str, ')')) {
-        return false;
-    }
-
-    // Iterate through the string to validate its structure
+    if (str == null || str.length() < 2) return false;
+    if (!str.startsWith("=")) return false;
+    if (str.substring(1).matches(".*[0-9]+[a-zA-Z].*")) return false;
+    if (str.substring(1).contains("=")) return false;
+    if (Character.isLetter(str.charAt(str.length() - 1))) return false;
+    if (Extras.inst_counter(str, '(') != Extras.inst_counter(str, ')')) return false;
+    if (str.endsWith(".")) return false;
     for (int i = 0; i < str.length() - 1; i++) {
         char currentChar = str.charAt(i);
         char nextChar = str.charAt(i + 1);
-
-        // Prevent consecutive dots ".."
-        if (currentChar == '.' && nextChar == '.') {
-            return false;
-        }
-
-        // Prevent invalid decimal points like "0.a2"
-        if (currentChar == '.' && !Character.isDigit(nextChar)) {
-            return false;
-        }
-
-        // Prevent invalid letters without a digit following
-        if (Character.isLetter(currentChar) && !Character.isDigit(nextChar)) {
-            return false;
-        }
-
-        // Validate operators (must be followed by a letter, digit, or '(')
-        if (Extras.is_opt(currentChar) && !(Character.isLetter(nextChar) || Character.isDigit(nextChar) || nextChar == '(')) {
-            return false;
-        }
+        if (currentChar == '.' && nextChar == '.') return false;
+        if (currentChar == '.' && !Character.isDigit(nextChar)) return false;
+        if (Character.isLetter(currentChar) && !(Character.isDigit(nextChar) || nextChar == '(')) return false;
+        if (Extras.is_opt(currentChar) && !(Character.isLetter(nextChar) || Character.isDigit(nextChar) || nextChar == '(')) return false;
     }
-
-    // Special case: If the formula ends with '.', it's invalid
-    if (str.endsWith(".")) {
-        return false;
-    }
-
-    // If all checks passed, the string is a valid formula
     return true;
 }
-
-
-    //@Override
     @Override
     public String toString() {
         return getData();

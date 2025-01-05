@@ -679,14 +679,10 @@ public final class StdDrawEx2 implements ActionListener, MouseListener, MouseMot
 		// frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);      // closes only current window
 		frame.setTitle("Ex2 Sol - Nadav sudri 322714924 - Cs101 Ariel");
 		frame.setJMenuBar(createMenuBar());
-
-
-
 		frame.pack();
 		frame.requestFocusInWindow();
 		frame.setVisible(true);
 	}
-
 	// create the menu bar (changed to private)
 	private static JMenuBar createMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
