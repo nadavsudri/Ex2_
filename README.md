@@ -5,4 +5,7 @@ and also capable of milty cell calculations - ex: "= 2*A2-(4+A3)"
 when an invalid data is enterd an error is shown:
 1) invalid formula - ERR_Form
 2) cerciular ref - ERR_cycle_form
+my solution calculates values of Refrenced cells by using depth property for each cell.
+each dependent cell's printed value is updated when its subcells are updated.
+the Solution's UI only shows [A-I] and [1-16] but tested when spreadsheet size in [A-Z] - [0-99]
 feel free to test the limits of my solution.
