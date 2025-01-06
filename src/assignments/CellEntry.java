@@ -5,6 +5,7 @@ package assignments;
 public class CellEntry  implements Index2D {
     private int x;
     private int y;
+    Cell sCell;
     @Override
     public boolean isValid() {
         String cords = this.toString();
@@ -13,10 +14,13 @@ public class CellEntry  implements Index2D {
         }
         return true;
     }
+    CellEntry(SCell sCell) {
+        this.sCell = sCell;
+    }
     @Override
     public int getX() {return x;}
     @Override
     public int getY() {return y;}
     @Override
-    public  String toString() {return""+Extras.int2_char(x)+y;}
+    public  String toString() {return sCell.getName();}
 }

@@ -15,7 +15,7 @@ import java.io.IOException;
  */
 public class Ex2GUI {
 	private static Sheet table; // this is the main data (an implementation of the Sheet interface).
-	private static Index2D cord = null; // a table entry used by the GUI of setting up a cell value / form
+	private static Index2D cord = new CellEntry(new SCell("")); // a table entry used by the GUI of setting up a cell value / form
 	public Ex2GUI() {}  // an empty (redundant) constructor.
 	/** The main function for running Ex2 */
 	public static void main(String[] a) {
@@ -123,6 +123,7 @@ public class Ex2GUI {
 			StdDrawEx2.text(Ex2Utils.GUI_X_START, Ex2Utils.MAX_X-1, ww);
 			StdDrawEx2.show();
 			if(Ex2Utils.Debug) {System.out.println(ww);}
+			cord = new CellEntry((SCell) cc);
 			String c = StdDrawEx2.getCell(cord,cc.getData());
 			String s1 = table.get(xx,yy).getData();
 			if(c==null) {
