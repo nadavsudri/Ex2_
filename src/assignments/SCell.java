@@ -43,17 +43,14 @@ public static boolean is_form(String str) {
     public String toString() {
         return getData();
     }
-
     @Override
 public void setData(String s) {
         line = s;
-
     }
     @Override
     public String getData() {
         return line;
     } // return the data String
-
     /**
      * return if the given string is a number (ex. 2.4 / 689540 / 0000.0)
      * **/

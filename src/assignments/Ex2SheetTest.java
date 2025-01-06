@@ -18,6 +18,23 @@ class Ex2SheetTest {
       }
   }
   @Test
+  void getSubcells () throws IOException {
+      set_for_test();
+      ex2Sheet.set(0,0,"=1+1");
+      ex2Sheet.set(0,1,"=1+A0");
+      ex2Sheet.set(0,2,"=A1+1");
+      ex2Sheet.set(0,3,"=A1+A0");
+      String []  subCords =  {"a0","a1"};
+      assertEquals("a0",ex2Sheet.getSubCells(ex2Sheet.get(0,1)).getName());
+      assertEquals("a1",ex2Sheet.getSubCells(ex2Sheet.get(0,2)).getName());
+      assertEquals("a1",ex2Sheet.getSubCells(ex2Sheet.get(0,3)).getName());
+      ex2Sheet.set(0,3,"=12+A0"); // after recurcive calculation
+      assertEquals("a0",ex2Sheet.getSubCells(ex2Sheet.get(0,3)).getName());
+
+
+
+  }
+  @Test
   void evaluate()
   {
       set_for_test();
@@ -30,7 +47,6 @@ class Ex2SheetTest {
       double []ev = {15,30,31,1570,0};
       for (int i=0;i<ev.length;i++)
       {double s = ex2Sheet.eValuate(cells[i]);
-          System.out.println(ex2Sheet.eValuate(cells[i]));
           assertEquals(s,ev[i]);
       }
 
@@ -46,8 +62,6 @@ class Ex2SheetTest {
         Cell [] cells = {ex2Sheet.get(1,3),ex2Sheet.get(0,0),ex2Sheet.get(1,0),ex2Sheet.get(12,3),ex2Sheet.get(4,11)};
         for (int i = 0; i<5;i++)
         {
-            System.out.println(cells[i].getName());
-            System.out.println(ex2Sheet.set_depth(cells[i]));
             assertEquals(dpths[i],ex2Sheet.set_depth(cells[i]));
         }
 
@@ -75,7 +89,22 @@ class Ex2SheetTest {
     }
 
     @Test
-    void depth() {
+    void value() {
+      set_for_test();
+      ex2Sheet.set(0,0,"=12+3");
+      ex2Sheet.set(1,0,"=2*a0");
+      ex2Sheet.set(12,3,"=1+b0");
+      ex2Sheet.set(1,3,"=1-11+10+a0");
+      ex2Sheet.set(16,91,"=24=23");
+      Cell [] cells = {ex2Sheet.get(0,0),ex2Sheet.get(1,0),ex2Sheet.get(12,3),ex2Sheet.get(1,3),ex2Sheet.get(16,91)};
+      String[] vals = {"15.0","30.0","31.0","15.0","ERR_Form_Format"};
+      assertEquals(vals[0],ex2Sheet.value(0,0));
+      assertEquals(vals[1],ex2Sheet.value(1,0));
+      assertEquals(vals[2],ex2Sheet.value(12,3));
+      assertEquals(vals[3],ex2Sheet.value(1,3));
+      assertEquals(vals[4],ex2Sheet.value(16,91));
+
+
 
 
     }

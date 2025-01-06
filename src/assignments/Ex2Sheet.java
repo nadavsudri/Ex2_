@@ -4,7 +4,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 /**
  * Ex2Sheet Class Documentation
@@ -32,13 +31,11 @@ import java.util.Set;
  * getSubCells(String str)
  * contCellRef(String str)
  * computeFrom(String str)
- *
  * documentation for each method exists next to the method itself.
- * **/
+ **/
 public class Ex2Sheet implements Sheet {
     private Cell[][] table;
    private Set<Cell> visitedCells = new HashSet<>(); //  (used in set_Depth) Track Subcells that was chacked
-
     public Ex2Sheet(int x, int y) {
         table = new SCell[x][y];
         for(int i=0;i<x;i=i+1) {
@@ -77,12 +74,13 @@ public class Ex2Sheet implements Sheet {
         };
 
     }
-
     @Override
     public Cell get(int x, int y) {
         return table[x][y];
     }
-
+/**
+ * return the cell in the cord specified
+ * **/
     @Override
     public Cell get(String cords) {
         Cell ans = null;
@@ -99,6 +97,10 @@ public class Ex2Sheet implements Sheet {
     {
         return table[0].length;
     }
+    /**
+     * sets the value of 's' to the cell at (x,y)
+     * sets this cell's "name" to accordingly
+     * **/
     @Override
     public void set(int x, int y, String s) {
         Cell c = new SCell(s);
@@ -124,6 +126,9 @@ public class Ex2Sheet implements Sheet {
             }
         }
     }
+    /**
+     * return if (xx,yy) cords are inside of this.table (changes by size)
+     **/
     @Override
     public boolean isIn(int xx, int yy) {
         boolean ans = xx>=0 && yy>=0;
@@ -137,7 +142,6 @@ public class Ex2Sheet implements Sheet {
      * the method uses a Set (defined above) to detect circular references before an STOF is accuring
      * @param a is being checked recursively when each the depth subcell that 'a' contains ia added to it.
      * for "1+a2" when a2 is: "=12*12" the function returns 1.
-     *
      * **/
     public int set_depth(Cell a) {
         if (a.getType() == Ex2Utils.TEXT) {return 0;}
@@ -187,7 +191,7 @@ public class Ex2Sheet implements Sheet {
         }
         return ans;
     }
-    //clear this.table
+    /**clear this.table**/
     private void clear()
     {
         for (int i = 0; i < width(); i++) {
@@ -259,7 +263,7 @@ public class Ex2Sheet implements Sheet {
         }
 
      /**
-      * this method calculates the final value of a cell (with dependencies)
+      * this method calculates the final value of a cell formula (with dependencies)
       * @param a is checked - if a formula return from computeform. if contains subcells - recursivly calculates the subcells first.
       *          if a contais a subcell - it calculate the subcell (ex: 1+A1 [A1="12"] ->  1+calc(A1) -> 1+12 -> 13)
       * finally returns the value as a double.
