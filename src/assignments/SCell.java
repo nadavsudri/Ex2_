@@ -22,14 +22,14 @@ public class SCell implements Cell {
  * @param str and return if the string is a valid formula or not.
  * **/
 public static boolean is_form(String str) {
-    if (str == null || str.length() < 2) return false;
-    if (!str.startsWith("=")) return false;
+    if (str == null || str.length() < 2) return false; // check null or leght less then 2
+    if (!str.startsWith("=")) return false;//chacks if starts with =
     if (str.substring(1).matches(".*[0-9]+[a-zA-Z].*")) return false;
-    if (str.substring(1).contains("=")) return false;
+    if (str.substring(1).contains("=")) return false; // checks for second equals sign
     if (Character.isLetter(str.charAt(str.length() - 1))) return false;
     if (Extras.inst_counter(str, '(') != Extras.inst_counter(str, ')')) return false;
     if (str.endsWith(".")) return false;
-    for (int i = 0; i < str.length() - 1; i++) {
+    for (int i = 0; i < str.length() - 1; i++) { // loops through the string and checks for invalid chars and combinations
         char currentChar = str.charAt(i);
         char nextChar = str.charAt(i + 1);
         if (currentChar == '.' && nextChar == '.') return false;

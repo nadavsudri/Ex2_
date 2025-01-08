@@ -39,10 +39,10 @@ class Ex2SheetTest {
   {
       set_for_test();
       ex2Sheet.set(0,0,"=12+3"); // -> 15
-      ex2Sheet.set(1,0,"=2*a0");//  - > 30
+      ex2Sheet.set(1,0,"=2*A0");//  - > 30
       ex2Sheet.set(12,3,"=1+b0"); // -> 31
       ex2Sheet.set(1,3,"=(12+b0)*b0+(10*m3)"); //   -> 1570
-     ex2Sheet.set(16,91,"=0.000000"); // -> 0
+      ex2Sheet.set(16,91,"=0.000000"); // -> 0
       Cell[] cells = {ex2Sheet.get(0,0),ex2Sheet.get(1,0),ex2Sheet.get(12,3),ex2Sheet.get(1,3),ex2Sheet.get(16,91)};
       double []ev = {15,30,31,1570,0};
       for (int i=0;i<ev.length;i++)

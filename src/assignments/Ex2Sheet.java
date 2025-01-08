@@ -272,6 +272,7 @@ public class Ex2Sheet implements Sheet {
     public double eValuate(Cell a)
     {
         double value=0;
+        a.setData(a.getData().toLowerCase()); //
         String str2eval;
         int a_depth = set_depth(a);
         if (SCell.isNumber(a.getData())){return Double.parseDouble(a.getData());}
@@ -280,8 +281,7 @@ public class Ex2Sheet implements Sheet {
             return computeFrom(str2eval);
         }
         if (SCell.is_form(a.getData())&&a_depth!=0&&!a.getData().isEmpty())
-        {   Cell c = getSubCells(a);
-            String name = c.getName();
+        {
             str2eval = a.getData().replace(getSubCells(a).getName(),String.valueOf(eValuate(getSubCells(a))));
             Cell sub = new SCell(str2eval);
             if (contCellRef(str2eval)){ value = value + eValuate(sub);}
