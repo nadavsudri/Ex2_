@@ -182,16 +182,16 @@ public class Ex2Sheet implements Sheet {
  * **/
     @Override
     public int[][] depth() {
-        int[][] ans = new int[width()][height()];
+        int[][] ans = new int[width()][height()]; // sets int[][] depth to the size of table
         for (int i = 0; i < width(); i++) {
             for (int j = 0; j < height(); j++) {
-                ans[i][j] = set_depth(table[i][j]);
+                ans[i][j] = set_depth(table[i][j]); // sets the value according to the actual depth
                 this.table[i][j].setOrder(ans[i][j]);
             }
         }
         return ans;
     }
-    /**clear this.table**/
+    /**clear this.table (Made for Load option)**/
     private void clear()
     {
         for (int i = 0; i < width(); i++) {
@@ -271,36 +271,38 @@ public class Ex2Sheet implements Sheet {
       * **/
     public double eValuate(Cell a)
     {
-        double value=0;
+        double value=0; // sets defalt to 0
         a.setData(a.getData().toLowerCase()); //
         String str2eval;
-        int a_depth = set_depth(a);
-        if (SCell.isNumber(a.getData())){return Double.parseDouble(a.getData());}
-        if (SCell.is_form(a.getData())&&a_depth==0&&!a.getData().isEmpty())
+        int a_depth = set_depth(a); // gets the cell's depth
+        if (SCell.isNumber(a.getData())){return Double.parseDouble(a.getData());} // if number - return value
+        if (SCell.is_form(a.getData())&&a_depth==0&&!a.getData().isEmpty())  // if there are no subcells or ref. and the data is a format - calculate
         {   str2eval = a.getData();
             return computeFrom(str2eval);
         }
-        if (SCell.is_form(a.getData())&&a_depth!=0&&!a.getData().isEmpty())
+        if (SCell.is_form(a.getData())&&a_depth!=0&&!a.getData().isEmpty()) // if the cell has refrences (depth !=0)
         {
-            str2eval = a.getData().replace(getSubCells(a).getName(),String.valueOf(eValuate(getSubCells(a))));
+            str2eval = a.getData().replace(getSubCells(a).getName(),String.valueOf(eValuate(getSubCells(a)))); // replace the referance with the cells actual value
             Cell sub = new SCell(str2eval);
             if (contCellRef(str2eval)){ value = value + eValuate(sub);}
             if (!contCellRef(str2eval)) value =  value + computeFrom(str2eval);
         }
+        a.setData(a.getData().toUpperCase());
         return value;
     }
     /**
      * this function return a Cell value for cell's subcell (if exists)
+     * iterates through the cell's data and returns the first subcell call (when called recurcivly returns all refrences)
      * @param cell's data is checked.
      * **/
     public Cell getSubCells(Cell cell) {
         if (cell == null) return null;
 
         for (int i = 0; i < cell.getData().length(); i++) {
-            char currentChar = cell.getData().charAt(i);
+            char currentChar = cell.getData().charAt(i); // get char at i
             if (Character.isLetter(currentChar)) {
                 currentChar = Character.toUpperCase(currentChar); // Normalize to uppercase
-                if (currentChar >= 'A' && currentChar <= 'Z') {
+                if (currentChar >= 'A' && currentChar <= 'Z') { // if char is a letter a-zA-Z
                     if (i + 1 < cell.getData().length() && Character.isDigit(cell.getData().charAt(i + 1))) {
                         int rowEnd = i + 2;
                         if (rowEnd < cell.getData().length() && Character.isDigit(cell.getData().charAt(rowEnd))) {
@@ -308,7 +310,7 @@ public class Ex2Sheet implements Sheet {
                         }
                         int row = Integer.parseInt(cell.getData().substring(i + 1, rowEnd));
                         if (row >= 0 && row <= 99) {
-                            return table[Extras.char2num(currentChar)][row];
+                            return table[Extras.char2num(currentChar)][row]; // returns the cell at (x,y) which refrenced
                         }
                     }
                 }
@@ -341,6 +343,7 @@ public class Ex2Sheet implements Sheet {
 /**
  * Computes the result of a mathematical expression given as a string.
  * The function supports basic arithmetic operations (+, -, *, /) and handles parentheses.
+ * this method looks for operands [+,-,/,*] and uses recursion to calculate ledt side of an expression with the right side of expression
  * @param str The mathematical expression as a string.
  *            The expression can include numbers, arithmetic operators, and parentheses.
  *            Examples: "1 + 2", "(3 + 5) * 2", "12 / (4 - 2)"

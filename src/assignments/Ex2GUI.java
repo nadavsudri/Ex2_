@@ -119,7 +119,7 @@ public class Ex2GUI {
 	private static void inputCell(int xx,int yy) {
 		if(table. isIn(xx,yy)) {
 			Cell cc = table.get(xx,yy);
-			String ww = cc.getName()+": "+cc.toString()+" : ";
+			String ww = cc.getName().toUpperCase()+": "+cc+" ";
 			StdDrawEx2.text(Ex2Utils.GUI_X_START, Ex2Utils.MAX_X-1, ww);
 			StdDrawEx2.show();
 			if(Ex2Utils.Debug) {System.out.println(ww);}

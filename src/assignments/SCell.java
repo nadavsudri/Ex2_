@@ -22,6 +22,7 @@ public class SCell implements Cell {
  * @param str and return if the string is a valid formula or not.
  * **/
 public static boolean is_form(String str) {
+    str = str.replace(" ","");
     if (str == null || str.length() < 2) return false; // check null or leght less then 2
     if (!str.startsWith("=")) return false;//chacks if starts with =
     if (str.substring(1).matches(".*[0-9]+[a-zA-Z].*")) return false;
@@ -53,6 +54,7 @@ public void setData(String s) {
     } // return the data String
     /**
      * return if the given string is a number (ex. 2.4 / 689540 / 0000.0)
+     * tries to convert to Double - catches when fails and return false.
      * **/
     public static boolean isNumber(String str) {
         try {

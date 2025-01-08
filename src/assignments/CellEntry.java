@@ -22,5 +22,5 @@ public class CellEntry  implements Index2D {
     @Override
     public int getY() {return y;}
     @Override
-    public  String toString() {return sCell.getName();}
+    public  String toString() {return sCell.getName().toUpperCase();}
 }
