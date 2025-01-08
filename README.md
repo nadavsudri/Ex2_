@@ -19,3 +19,9 @@ the Solution's UI only shows [A-I] and [1-16] but tested when spreadsheet size i
 feel free to test the limits of my solution.
 
 if needed https://github.com/nadavsudri/Ex2.git -------> First Part Only!
+
+<img src="https://raw.githubusercontent.com/nadavsudri/Ex2_/refs/heads/master/for%20readme.webp" alt="Description of the Image" width="300">
+
+
+
+
