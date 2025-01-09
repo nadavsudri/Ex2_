@@ -43,7 +43,6 @@ public class Ex2Sheet implements Sheet {
                 table[i][j] = new SCell("");
                 table[i][j].setName(Extras.int2_char(i)+""+j);
                 table[i][j].setType(table[i][j].getType());
-                //  System.out.println(this.table[i][j].getName());
             }
         }
         eval();

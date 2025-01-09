@@ -25,6 +25,7 @@ public static boolean is_form(String str) {
     str = str.replace(" ","");
     if (str == null || str.length() < 2) return false; // check null or leght less then 2
     if (!str.startsWith("=")) return false;//chacks if starts with =
+    if(!Extras.cont_invalid(str)) return false;
     if (str.substring(1).matches(".*[0-9]+[a-zA-Z].*")) return false;
     if (str.substring(1).contains("=")) return false; // checks for second equals sign
     if (Character.isLetter(str.charAt(str.length() - 1))) return false;
